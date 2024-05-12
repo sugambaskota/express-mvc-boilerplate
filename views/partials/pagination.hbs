@@ -1,0 +1,79 @@
+<div class="flex flex-wrap gap-x-4 gap-y-2">
+  <!-- Pagination -->
+  <nav class="flex items-center gap-x-1">
+    <a href="{{#if previousPage}}?page={{dec page}}&limit={{limit}}&search={{search}}{{else}}#{{/if}}"
+      class="min-h-[32px] min-w-8 py-2 px-2 inline-flex justify-center items-center gap-x-2 text-sm rounded-full text-gray-900 hover:bg-neutral-50 focus:outline-none active:bg-neutral-50 disabled:opacity-50 disabled:pointer-events-none">
+      <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m15 18-6-6 6-6"></path>
+      </svg>
+      <span aria-hidden="true" class="sr-only">Previous</span>
+    </a>
+    <div class="flex items-center gap-x-1">
+      <span
+        class="min-h-[32px] min-w-8 flex justify-center items-center text-gray-900 py-1 px-3 bg-neutral-50 text-sm rounded-full focus:outline-none disabled:opacity-50 disabled:pointer-events-none">{{page}}</span>
+      <span class="min-h-[32px] flex justify-center items-center text-gray-700 py-1.5 px-1.5 text-sm">of</span>
+      <span class="min-h-[32px] flex justify-center items-center text-gray-700 py-1.5 px-1.5 text-sm">{{ceil (div total
+        limit)}}</span>
+    </div>
+    <a href="{{#if nextPage}}?page={{inc page}}&limit={{limit}}&search={{search}}{{else}}#{{/if}}"
+      class="min-h-[32px] min-w-8 py-2 px-2 inline-flex justify-center items-center gap-x-2 text-sm rounded-full text-gray-900 hover:bg-neutral-50 focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
+      <span aria-hidden="true" class="sr-only">Next</span>
+      <svg class="flex-shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m9 18 6-6-6-6"></path>
+      </svg>
+    </a>
+  </nav>
+  <!-- End Pagination -->
+
+  <div class="flex justify-center items-center gap-x-3">
+    <!-- Dropdown -->
+    <div x-data="{ linkActive: false }" class="relative inline-flex">
+      <button @click="linkActive = !linkActive" type="button"
+        class="min-h-[32px] py-1 px-2 inline-flex items-center gap-x-1 text-sm rounded-md text-gray-900 bg-neutral-50 outline-none focus:ring-1 focus:ring-skin-primary disabled:opacity-50 disabled:pointer-events-none">
+        {{limit}} / page
+        <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </button>
+      <div x-cloak x-show="linkActive" @click.away="linkActive = false"
+        class="absolute left-0 w-32 bottom-9 z-20 bg-white shadow-md rounded-md p-2 space-y-1">
+        <a href="?page=1&limit=10&search={{search}}"
+          class="inline-block w-full py-2 px-3 rounded-md text-sm text-left text-gray-900 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none {{#compare limit 10}}bg-gray-100{{/compare}}">
+          10 / page
+        </a>
+        <a href="?page=1&limit=20&search={{search}}"
+          class="inline-block w-full py-2 px-3 rounded-md text-sm text-left text-gray-900 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none {{#compare limit 20}}bg-gray-100{{/compare}}">
+          20 / page
+        </a>
+        <a href="?page=1&limit=50&search={{search}}"
+          class="inline-block w-full py-2 px-3 rounded-md text-sm text-left text-gray-900 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none {{#compare limit 50}}bg-gray-100{{/compare}}">
+          50 / page
+        </a>
+        <a href="?page=1&limit=100&search={{search}}"
+          class="inline-block w-full py-2 px-3 rounded-md text-sm text-left text-gray-900 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none {{#compare limit 100}}bg-gray-100{{/compare}}">
+          100 / page
+        </a>
+      </div>
+    </div>
+    <!-- End Dropdown -->
+
+    <!-- Go To Page -->
+    <div
+      x-data="{ desiredPage: '', goToDesiredPage() {if(this.desiredPage<1){window.location.search='?page=1&limit={{limit}}&search={{search}}'}else if(this.desiredPage>Math.ceil({{total}}/{{limit}})){window.location.search='?page='+Math.ceil({{total}}/{{limit}})+'&limit={{limit}}&search={{search}}'}else{window.location.search='?page='+this.desiredPage+'&limit={{limit}}&search={{search}}'}} }"
+      class="flex items-center gap-x-2">
+      <span class="text-sm text-gray-900 whitespace-nowrap">
+        Go to
+      </span>
+      <input x-model="desiredPage" @blur="goToDesiredPage()" @keyup.enter="goToDesiredPage()" type="number"
+        class="min-h-[32px] py-1 px-2.5 block w-12 rounded-md text-sm text-center border-none focus:ring-skin-primary [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 disabled:pointer-events-none"
+        style="-moz-appearance: textfield;">
+      <span class="text-sm text-gray-900 whitespace-nowrap">
+        page
+      </span>
+    </div>
+    <!-- End Go To Page -->
+  </div>
+</div>

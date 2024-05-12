@@ -1,0 +1,94 @@
+{{#section "head"}}
+<link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+<link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet" />
+{{/section}}
+
+<div class="p-8 bg-white rounded-lg">
+  <form method="POST" action="/admin/profile" class="flex flex-col space-y-8 max-w-screen-sm">
+    <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
+    <div class="flex flex-col space-y-2">
+      <label class="text-sm text-gray-500">Photo</label>
+      <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif" hidden />
+      {{#if fieldErrors.image}}
+      {{#each fieldErrors.image}}
+      <p class="text-sm text-red-500">{{this}}</p>
+      {{/each}}
+      {{/if}}
+    </div>
+    <div class="flex flex-col space-y-2">
+      <label for="full_name" class="text-sm text-gray-500">Full Name</label>
+      <input id="full_name" name='fullName' placeholder='Full name' value='{{user.fullName}}'
+        class='w-full rounded-md py-2.5 px-4 border text-sm outline-skin-primary {{#if fieldErrors.fullName}}border-red-500{{/if}}' />
+      {{#if fieldErrors.fullName}}
+      {{#each fieldErrors.fullName}}
+      <p class="text-sm text-red-500">{{this}}</p>
+      {{/each}}
+      {{/if}}
+    </div>
+    <div class="flex justify-end">
+      <button
+        class='inline-flex items-center px-4 py-2 bg-skin-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-skin-primary/80 focus:bg-skin-primary/80 active:bg-skin-primary/80 focus:outline-none focus:ring-2 focus:ring-skin-primary focus:ring-offset-2 transition ease-in-out duration-150'>
+        SAVE
+      </button>
+    </div>
+  </form>
+</div>
+
+{{#section "script"}}
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+<script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+<script>
+  FilePond.registerPlugin(FilePondPluginImagePreview);
+  FilePond.create(document.querySelector('#image'), {
+    labelIdle: `Drag & Drop your picture or <span class="filepond--label-action">Browse</span>`,
+    imagePreviewHeight: 64,
+    required: false,
+    credits: false,
+    server: {
+      load: (source, load, error, progress, abort, headers) => {
+        fetch(source).then((res) => res.blob()).then(load);
+      },
+      process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+        const formData = new FormData();
+
+        formData.append(fieldName, file);
+        formData.append("folder", "profile_pictures");
+
+        const request = new XMLHttpRequest();
+        request.open('POST', '/upload/image');
+
+        request.upload.onprogress = (e) => {
+          progress(e.lengthComputable, e.loaded, e.total);
+        };
+
+        request.onload = function () {
+          if (request.status >= 200 && request.status < 300) {
+            const jsonRes = JSON.parse(request.responseText);
+
+            if (jsonRes?.data?.path) {
+              load(jsonRes.data.path);
+            }
+          } else {
+            error('Sorry, something went wrong!');
+          }
+        };
+
+        request.send(formData);
+
+        return {
+          abort: () => {
+            request.abort();
+            abort();
+          },
+        };
+      },
+    },
+    files: "{{user.image}}" ? [{
+      source: "{{user.image}}",
+      options: {
+        type: "local"
+      }
+    }] : null
+  });
+</script>
+{{/section}}

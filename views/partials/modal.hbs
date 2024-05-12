@@ -1,0 +1,43 @@
+<div x-show="modalOpen" class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+  <div class="flex justify-center min-h-screen px-4 text-center md:items-center sm:block sm:p-0">
+
+    {{!-- start::Modal overlay --}}
+    <div x-cloak @click="modalOpen=false" x-show="modalOpen"
+      x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200 transform"
+      x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+      class="fixed inset-0 transition-opacity bg-black bg-opacity-50" aria-hidden="true" />
+    {{!-- end::Modal overlay --}}
+
+    {{!-- start::Modal popup --}}
+    <div x-cloak x-show="modalOpen" x-transition:enter="transition ease-out duration-300 transform"
+      x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+      x-transition:leave="transition ease-in duration-200 transform"
+      x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      class="inline-block w-full max-w-xl p-5 my-20 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl 2xl:max-w-2xl">
+
+      {{!-- start::Modal title and close --}}
+      <div class="flex items-center justify-between space-x-4">
+        <h1 class="text-lg font-medium text-gray-800">{{title}}</h1>
+
+        <button @click="modalOpen=false"
+          class="text-gray-600 focus:outline-none hover:text-gray-700 hover:bg-gray-100 rounded p-px">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      {{!-- end::Modal title and close --}}
+
+      {{!-- start::Modal content --}}
+      {{> @partial-block }}
+      {{!-- end::Modal content --}}
+
+    </div>
+    {{!-- end::Modal popup --}}
+
+  </div>
+</div>

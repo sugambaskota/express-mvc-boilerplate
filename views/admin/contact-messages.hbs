@@ -1,0 +1,103 @@
+<div class="flex flex-wrap justify-between items-end gap-x-3 gap-y-2">
+  <h1 class="text-xl leading-tight font-semibold">
+    Contact Messages ({{total}})
+  </h1>
+  <div x-data="{ keyword: '{{search}}' }" class="flex flex-wrap gap-2">
+    <div class="relative">
+      <input x-model="keyword" @keyup.enter="window.location.search='?page=1&limit={{limit}}&search=' + keyword"
+        type="text" placeholder="Search..." class="h-9 border-none rounded focus:ring-skin-primary" />
+      <div x-cloak x-show="!!keyword" x-transition class='absolute inset-y-0 right-0 pr-2 flex items-center'>
+        <a href="?page=1&limit={{limit}}"
+          class="text-gray-600 focus:outline-none hover:text-gray-700 hover:bg-gray-100 rounded p-px">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </a>
+      </div>
+    </div>
+    <a :href="'?page=1&limit={{limit}}&search=' + keyword"
+      class="inline-flex items-center bg-skin-primary px-5 text-white h-9 rounded">Search</a>
+  </div>
+</div>
+
+{{#if search}}
+<p class="mt-3 text-base leading-tight text-center">
+  Showing search results for '{{search}}'
+</p>
+{{/if}}
+
+<div class="mt-3 relative overflow-x-auto rounded">
+  <table class="w-full text-left text-sm text-gray-500">
+    <thead class="bg-gray-50 text-gray-700">
+      <tr>
+        <th scope="col" class="px-6 py-3">S.N.</th>
+        <th scope="col" class="px-6 py-3">FULL NAME</th>
+        <th scope="col" class="px-6 py-3">EMAIL</th>
+        <th scope="col" class="px-6 py-3">ADDRESS</th>
+        <th scope="col" class="px-6 py-3">CONTACT NUMBER</th>
+        <th scope="col" class="px-6 py-3 text-center">
+          ACTION
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#if results.length}}
+      {{#each results}}
+      <tr class="border-b bg-white hover:bg-gray-100 text-gray-900">
+        <td class="px-6 py-4">{{add (inc @index) (mul ../limit (sub ../page 1))}}</td>
+        <td class="px-6 py-4">{{this.fullName}}</td>
+        <td class="px-6 py-4">{{this.email}}</td>
+        <td class="px-6 py-4">{{this.address}}</td>
+        <td class="px-6 py-4">{{this.contactNumber}}</td>
+        <td class="px-6 py-4 text-center">
+          <div x-data="{ modalOpen: false }" @keydown.escape="modalOpen=false;$event.target.blur();">
+            <button @click="modalOpen=true" class="font-semibold text-blue-500 hover:underline">
+              View
+            </button>
+            {{#> modal title="View Contact Message" }}
+            <div class="mt-2 space-y-1">
+              <div>
+                <p class="font-semibold">Full Name:</p>
+                <p>{{this.fullName}}</p>
+              </div>
+              <div>
+                <p class="font-semibold">Email:</p>
+                <p>{{this.email}}</p>
+              </div>
+              <div>
+                <p class="font-semibold">Contact Number:</p>
+                <p>{{this.contactNumber}}</p>
+              </div>
+              <div>
+                <p class="font-semibold">Address:</p>
+                <p>{{this.address}}</p>
+              </div>
+              <div>
+                <p class="font-semibold">Message:</p>
+                <p>{{this.message}}</p>
+              </div>
+            </div>
+            {{/modal}}
+          </div>
+        </td>
+      </tr>
+      {{/each}}
+      {{else}}
+      <tr>
+        <td colspan="6">
+          <p class="p-6 text-center text-base font-semibold bg-white">
+            Sorry, no data available.
+          </p>
+        </td>
+      </tr>
+      {{/if}}
+    </tbody>
+  </table>
+</div>
+
+{{#if results.length}}
+<div class="mt-4">
+  {{> pagination page=page limit=limit total=total search=search previousPage=previousPage nextPage=nextPage }}
+</div>
+{{/if}}

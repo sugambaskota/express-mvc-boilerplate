@@ -1,0 +1,17 @@
+<div>
+  {{#if user}}
+  <p>Hello, {{user.fullName}}!
+  <form action="/auth/logout" method="POST">
+    <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
+    <button>Logout</button>
+  </form>
+  </p>
+  {{/if}}
+  <a href="/auth/login" class="block">Go to login</a>
+  <a href="/auth/register" class="block">Go to register</a>
+  <a href="/admin" class="block">Go to admin</a>
+</div>
+
+{{#section "head"}}
+<title>Home</title>
+{{/section}}
